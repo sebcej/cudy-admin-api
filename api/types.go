@@ -28,6 +28,12 @@ type Config struct {
 	Sm               SessionManager
 }
 
+type TableRow struct {
+	Label     string
+	Value     string
+	ExtraData map[string]string
+}
+
 const (
 	LoginMethodDefault LoginMethod = iota
 	LoginMethodUnencrypted
