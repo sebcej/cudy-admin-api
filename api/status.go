@@ -10,8 +10,9 @@ type StatusResponse struct {
 	ActivityTime  string
 }
 
+// Get status/uptime of router and its firmware version
 func (c *Config) Status() (resp *StatusResponse, err error) {
-	response, err := c.sessionApiCall("/cgi-bin/luci/admin/system/status", nil)
+	response, err := c.sessionApiCall("/cgi-bin/luci/admin/system/status", nil, nil)
 	if err != nil {
 		return nil, err
 	}

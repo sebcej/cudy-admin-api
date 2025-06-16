@@ -25,7 +25,7 @@ type ConnectedDevicesResponse struct {
 }
 
 func (c *Config) ConnectedDevices() (resp *ConnectedDevicesResponse, err error) {
-	response, err := c.sessionApiCall("/cgi-bin/luci/admin/network/devices/devlist?detail=1", nil)
+	response, err := c.sessionApiCall("/cgi-bin/luci/admin/network/devices/devlist?detail=1", nil, nil)
 	if err != nil {
 		return nil, err
 	}

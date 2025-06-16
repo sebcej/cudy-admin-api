@@ -20,13 +20,15 @@ type GcomStatusResponse struct {
 	RawValues      []TableRow
 }
 
+// Get interface communication data
+// Currently supported only for 4g Router
 func (c *Config) GcomStatus(iface ...string) (resp *GcomStatusResponse, err error) {
 	path := "/cgi-bin/luci/admin/network/gcom/status?detail=1"
 	if len(iface) == 1 {
 		path += "&iface" + iface[0]
 	}
 
-	response, err := c.sessionApiCall(path, nil)
+	response, err := c.sessionApiCall(path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +64,10 @@ func (c *Config) GcomStatus(iface ...string) (resp *GcomStatusResponse, err erro
 			Value: value,
 		})
 	})
+
+	if len(rawValues) < 2 {
+		return nil, ErrParseError
+	}
 
 	usageString := rawValues[1].Value
 	splittedUsageString := strings.Split(usageString, "/")

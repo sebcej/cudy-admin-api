@@ -2,11 +2,10 @@ package api
 
 import (
 	"net/http"
-	"sync"
+	"time"
 )
 
 type Credentials struct {
-	Timezone string
 	Username string
 	Password string
 }
@@ -16,22 +15,44 @@ type LoginMethod int
 type SessionManager struct {
 	session    http.CookieJar
 	MaxRetries int
-	mu         sync.Mutex
+	RetryWait  time.Duration
+}
+
+type Headers map[string]string
+
+type Api struct {
+	Host             string
+	ExtraHeaders     Headers
+	SecureConnection bool
+	Sm               SessionManager
 }
 
 type Config struct {
-	Host             string
-	ExtraHeaders     map[string]string
-	Credentials      Credentials
-	LoginMethod      LoginMethod
-	SecureConnection bool
-	Sm               SessionManager
+	Api         Api
+	Credentials Credentials
+	LoginMethod LoginMethod
+	TimeZone    string
 }
 
 type TableRow struct {
 	Label     string
 	Value     string
 	ExtraData map[string]string
+}
+
+type Message struct {
+	api    *Config
+	iface  string
+	smsbox string
+
+	ID          string
+	PhoneNumber string
+	Preview     string
+	CreatedAt   string
+}
+
+type Interface struct {
+	Name string
 }
 
 const (

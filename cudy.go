@@ -1,24 +1,28 @@
 package cudy
 
 import (
+	"time"
+
 	"github.com/sebcej/cudy-admin-api/api"
 )
 
 func Init(host string, username string, password string) (config *api.Config, err error) {
 	config = &api.Config{
+		Api: api.Api{
+			Host:             host,
+			SecureConnection: false,
+			Sm: api.SessionManager{
+				MaxRetries: 2,
+				RetryWait:  1 * time.Second,
+			},
+		},
 		Credentials: api.Credentials{
-			Timezone: "Europe/Rome",
 			Username: username,
 			Password: password,
 		},
-		Host:             host,
-		SecureConnection: false,
-		Sm: api.SessionManager{
-			MaxRetries: 1,
-		},
+		LoginMethod: api.LoginMethodDefault,
+		TimeZone:    "Europe/Rome",
 	}
-
-	config.LoginMethod = api.LoginMethodDefault
 
 	return config, nil
 }

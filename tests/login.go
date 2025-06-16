@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-// Config holds test server configuration
 type Config struct {
 	Username       string
 	Password       string
@@ -16,13 +15,11 @@ type Config struct {
 	HiddenInputs   map[string]string
 }
 
-// NewTestServer creates an HTTP test server with /cgi-bin/luci routes
 func NewLoginTestServer(t *testing.T, cfg Config) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/cgi-bin/luci/":
 			if r.Method == http.MethodGet {
-				// Return HTML with hidden inputs
 				html := `<html><body><form>`
 				for name, value := range cfg.HiddenInputs {
 					html += `<input type="hidden" name="` + name + `" value="` + value + `">`
@@ -32,14 +29,12 @@ func NewLoginTestServer(t *testing.T, cfg Config) *httptest.Server {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(html))
 			} else if r.Method == http.MethodPost {
-				// Parse form data
 				if err := r.ParseForm(); err != nil {
 					t.Errorf("Server: failed to parse form: %v", err)
 					w.WriteHeader(http.StatusBadRequest)
 					return
 				}
 
-				// Validate luci_username and luci_password
 				username := r.FormValue("luci_username")
 				password := r.FormValue("luci_password")
 

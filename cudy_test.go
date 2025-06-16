@@ -53,14 +53,9 @@ func TestLogin(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cudyApi, _ := cudy.Init(testServer.URL, serverCfg.Username, serverCfg.Password)
-
-			// Apply modifications
 			tt.modifyConfig(cudyApi)
-
-			// Call DefaultLogin
 			err := cudyApi.Login()
 
-			// Check error
 			if tt.expectedErrMsg != "" {
 				if err == nil || err.Error() != tt.expectedErrMsg {
 					t.Errorf("DefaultLogin() error = %v, expectedErrMsg %q", err, tt.expectedErrMsg)

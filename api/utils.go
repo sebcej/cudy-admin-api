@@ -3,33 +3,34 @@ package api
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"strings"
+	"time"
 )
 
-func (c *Config) apiCall(path string, body io.Reader) (response *http.Response, err error) {
-	if c.Sm.session == nil {
-		c.Sm.session, err = cookiejar.New(nil)
+func (c *Config) apiCall(path string, body io.Reader, extraHeaders *Headers) (response *http.Response, err error) {
+	if c.Api.Sm.session == nil {
+		c.Api.Sm.session, err = cookiejar.New(nil)
 		if err != nil {
-			log.Fatal(err)
+			panic(ErrFetchError)
 		}
 	}
 
 	client := &http.Client{
-		Jar: c.Sm.session,
+		Jar: c.Api.Sm.session,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
 	}
 
 	pre := ""
-	if !strings.HasPrefix(c.Host, "http") {
+	if !strings.HasPrefix(c.Api.Host, "http") {
 		pre = "http://"
 
-		if c.SecureConnection {
+		if c.Api.SecureConnection {
 			pre = "https://"
 		}
 	}
@@ -39,15 +40,20 @@ func (c *Config) apiCall(path string, body io.Reader) (response *http.Response, 
 		method = "POST"
 	}
 
-	req, _ := http.NewRequest(method, pre+c.Host+path, body)
+	req, _ := http.NewRequest(method, pre+c.Api.Host+path, body)
 
-	req.Header.Add("User-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
-	req.Header.Add("Host", c.Host)
-	req.Header.Add("Origin", pre+c.Host)
-	req.Header.Add("Referer", pre+c.Host+"/cgi-bin/luci")
+	req.Header.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
+	req.Header.Add("Host", c.Api.Host)
+	req.Header.Add("Referer", pre+c.Api.Host+"/cgi-bin/luci/")
+	req.Header.Add("X-Requested-With", "XMLHttpRequest")
 
-	for key, value := range c.ExtraHeaders {
+	for key, value := range c.Api.ExtraHeaders {
 		req.Header.Add(key, value)
+	}
+	if extraHeaders != nil {
+		for key, value := range *extraHeaders {
+			req.Header.Add(key, value)
+		}
 	}
 
 	if body != nil {
@@ -62,29 +68,24 @@ func (c *Config) apiCall(path string, body io.Reader) (response *http.Response, 
 	return
 }
 
-func (c *Config) sessionApiCall(path string, body io.Reader) (response *http.Response, err error) {
+func (c *Config) sessionApiCall(path string, body io.Reader, extraHeaders *Headers) (response *http.Response, err error) {
 	attempts := 0
 
 	for {
-		c.Sm.mu.Lock()
-		response, err = c.apiCall(path, body)
-		c.Sm.mu.Unlock()
+		response, err = c.apiCall(path, body, extraHeaders)
 		if err != nil {
 			return response, err
 		}
 
 		// We tried, lets throw an error
-		if attempts >= c.Sm.MaxRetries {
+		if attempts >= c.Api.Sm.MaxRetries {
 			return response, err
 		}
 
 		// Session expired, let's login again
 		if response.StatusCode == 403 {
-			c.Sm.mu.Lock()
-
 			attempts++
 			err := c.Login()
-			c.Sm.mu.Unlock()
 
 			if err != nil {
 				return nil, err
@@ -93,9 +94,12 @@ func (c *Config) sessionApiCall(path string, body io.Reader) (response *http.Res
 			continue
 		}
 
-		// Unknown error, let's retry just in case
+		// Unknown error, let's retry
 		if response.StatusCode > 300 || response.StatusCode < 200 {
 			attempts++
+
+			time.Sleep(1 * time.Second)
+
 			continue
 		}
 
@@ -114,4 +118,16 @@ func hashPassword(password, salt string) string {
 
 	// Convert to hexadecimal string
 	return hex.EncodeToString(hashBytes)
+}
+
+func rateLabel(bytes float64) string {
+	uby := "Kbps"
+	kby := bytes * 8 / 1024
+
+	if kby >= 1024 {
+		uby = "Mbps"
+		kby = kby / 1024
+	}
+
+	return fmt.Sprintf("%.1f %s", kby, uby)
 }

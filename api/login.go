@@ -14,7 +14,7 @@ func (c *Config) Login() (err error) {
 	password := c.Credentials.Password
 
 	if c.LoginMethod == LoginMethodDefault {
-		homeResponse, err := c.apiCall("/cgi-bin/luci/", nil)
+		homeResponse, err := c.apiCall("/cgi-bin/luci/", nil, nil)
 		if err != nil {
 			return ErrFetchError
 		}
@@ -45,10 +45,10 @@ func (c *Config) Login() (err error) {
 	form.Add("luci_password", password)
 
 	form.Add("timeclock", fmt.Sprintf("%d", time.Now().Unix()))
-	form.Add("zonename", c.Credentials.Timezone)
+	form.Add("zonename", c.TimeZone)
 
 	formBody := bytes.NewReader([]byte(form.Encode()))
-	response, err := c.apiCall("/cgi-bin/luci/", formBody)
+	response, err := c.apiCall("/cgi-bin/luci/", formBody, nil)
 	if err != nil {
 		return err
 	}
