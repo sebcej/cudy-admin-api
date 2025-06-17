@@ -7,9 +7,17 @@ Tested on:
 
 Some of the functionalities may be supported only for this version (4g) of the router.
 
+## Installation
+
+`go get github.com/sebcej/cudy-admin-api`
+
 ## Initialization
 
 ```go
+import (
+    cudy "github.com/sebcej/cudy-admin-api"
+)
+
 api := cudy.Init("192.168.0.1", "admin", "password") // if the interface is without username put "admin" as default
 
 // Mandatory if maxRetries is 0
