@@ -56,10 +56,6 @@ func (c *Config) apiCall(path string, body io.Reader, extraHeaders *Headers) (re
 		}
 	}
 
-	if body != nil {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	}
-
 	response, err = client.Do(req)
 	if err != nil {
 		return nil, err

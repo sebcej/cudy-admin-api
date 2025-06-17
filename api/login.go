@@ -20,7 +20,7 @@ func (c *Config) Login() (err error) {
 		}
 		doc, err := goquery.NewDocumentFromReader(homeResponse.Body)
 		if err != nil {
-			return ErrFetchError
+			return err
 		}
 
 		csrfToken := doc.Find("input[type='hidden'][name='_csrf']").AttrOr("value", "")
@@ -48,7 +48,10 @@ func (c *Config) Login() (err error) {
 	form.Add("zonename", c.TimeZone)
 
 	formBody := bytes.NewReader([]byte(form.Encode()))
-	response, err := c.apiCall("/cgi-bin/luci/", formBody, nil)
+	headers := &Headers{
+		"Content-Type": "application/x-www-form-urlencoded",
+	}
+	response, err := c.apiCall("/cgi-bin/luci/", formBody, headers)
 	if err != nil {
 		return err
 	}

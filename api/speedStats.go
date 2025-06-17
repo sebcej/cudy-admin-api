@@ -17,10 +17,7 @@ type SpeedStatsResponse struct {
 * * usb0 - 4g module
 **/
 func (c *Config) SpeedStats(iface string) (resp *SpeedStatsResponse, err error) {
-	extraHeaders := &Headers{
-		"Accept": "*/*",
-	}
-	response, err := c.sessionApiCall("/cgi-bin/luci/admin/status/bandwidth?iface="+iface, nil, extraHeaders)
+	response, err := c.sessionApiCall("/cgi-bin/luci/admin/status/bandwidth?iface="+iface, nil, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -17,7 +17,7 @@ func (m *Message) Delete() error {
 	return nil
 }
 
-func (m *Message) GetContent() (MessageContent, error) {
+func (m *Message) Content() (MessageContent, error) {
 	if m.api == nil || m.iface == "" {
 		return "", ErrUnknownError
 	}
@@ -35,4 +35,8 @@ func (m *Message) GetContent() (MessageContent, error) {
 	message := MessageContent(doc.Find("textarea").First().Text())
 
 	return message, nil
+}
+
+func (m *Message) Reply(message string) error {
+	return m.api.SendMessage(m.PhoneNumber, message, m.iface)
 }

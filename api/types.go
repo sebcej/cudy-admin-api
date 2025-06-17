@@ -13,7 +13,8 @@ type Credentials struct {
 type LoginMethod int
 
 type SessionManager struct {
-	session    http.CookieJar
+	session http.CookieJar
+
 	MaxRetries int
 	RetryWait  time.Duration
 }
@@ -49,10 +50,6 @@ type Message struct {
 	PhoneNumber string
 	Preview     string
 	CreatedAt   string
-}
-
-type Interface struct {
-	Name string
 }
 
 const (
