@@ -34,6 +34,13 @@ func (c *Config) SpeedStats(iface string) (resp *SpeedStatsResponse, err error) 
 		return nil, ErrParseError
 	}
 
+	if len(responseData) <= 2 {
+		return &SpeedStatsResponse{
+			RX: rateLabel(0),
+			TX: rateLabel(0),
+		}, nil
+	}
+
 	// Adapted from response of chart api call
 	row := responseData[len(responseData)-1]
 	oldRow := responseData[len(responseData)-2]
