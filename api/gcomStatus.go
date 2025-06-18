@@ -63,7 +63,7 @@ func (c *Config) GcomStatus(iface ...string) (resp *GcomStatusResponse, err erro
 		})
 	})
 
-	if len(rawValues) < 2 {
+	if len(rawValues) < 6 {
 		return nil, ErrParseError
 	}
 
