@@ -18,6 +18,8 @@ func (c *Config) SendMessage(phoneNumber string, message string, iface string) (
 	if err != nil {
 		return ErrFetchError
 	}
+	defer homeResponse.Body.Close()
+
 	doc, err := goquery.NewDocumentFromReader(homeResponse.Body)
 	if err != nil {
 		return err
@@ -47,6 +49,7 @@ func (c *Config) SendMessage(phoneNumber string, message string, iface string) (
 	if err != nil {
 		return err
 	}
+	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
 		return ErrParseError

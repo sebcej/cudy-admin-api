@@ -18,6 +18,8 @@ func (c *Config) Login() (err error) {
 		if err != nil {
 			return ErrFetchError
 		}
+		defer homeResponse.Body.Close()
+
 		doc, err := goquery.NewDocumentFromReader(homeResponse.Body)
 		if err != nil {
 			return err
@@ -55,6 +57,7 @@ func (c *Config) Login() (err error) {
 	if err != nil {
 		return err
 	}
+	defer response.Body.Close()
 
 	switch response.StatusCode {
 	case 302:

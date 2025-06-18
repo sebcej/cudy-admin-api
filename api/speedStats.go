@@ -21,6 +21,7 @@ func (c *Config) SpeedStats(iface string) (resp *SpeedStatsResponse, err error) 
 	if err != nil {
 		return nil, err
 	}
+	defer response.Body.Close()
 
 	var responseData [][]int64
 

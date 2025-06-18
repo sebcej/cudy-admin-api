@@ -29,6 +29,7 @@ func (c *Config) ConnectedDevices() (resp *ConnectedDevicesResponse, err error) 
 	if err != nil {
 		return nil, err
 	}
+	defer response.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {

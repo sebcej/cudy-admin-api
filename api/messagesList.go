@@ -18,6 +18,7 @@ func (c *Config) MessagesList(box string, iface string) (resp *GetMessagesListRe
 	if err != nil {
 		return nil, err
 	}
+	defer response.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {

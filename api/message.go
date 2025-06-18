@@ -26,6 +26,7 @@ func (m *Message) Content() (MessageContent, error) {
 	if err != nil {
 		return "", err
 	}
+	defer response.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
