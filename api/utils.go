@@ -15,7 +15,7 @@ func (c *Config) apiCall(path string, body io.Reader, extraHeaders *Headers) (re
 	if c.Api.Sm.session == nil {
 		c.Api.Sm.session, err = cookiejar.New(nil)
 		if err != nil {
-			panic(ErrFetchError)
+			return response, err
 		}
 	}
 
