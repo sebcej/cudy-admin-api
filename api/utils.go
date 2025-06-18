@@ -94,7 +94,7 @@ func (c *Config) sessionApiCall(path string, body io.Reader, extraHeaders *Heade
 		if response.StatusCode > 300 || response.StatusCode < 200 {
 			attempts++
 
-			time.Sleep(1 * time.Second)
+			time.Sleep(c.Api.Sm.RetryWait)
 
 			continue
 		}
